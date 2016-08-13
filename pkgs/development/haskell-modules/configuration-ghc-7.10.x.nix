@@ -63,6 +63,8 @@ self: super: {
   nats = dontHaddock super.nats;
   bytestring-builder = dontHaddock super.bytestring-builder;
 
+  hoauth2 = overrideCabal super.hoauth2 (drv: { testDepends = (drv.testDepends or []) ++ [ self.wai self.warp ]; });
+
   # Setup: At least the following dependencies are missing: base <4.8
   hspec-expectations = overrideCabal super.hspec-expectations (drv: {
     postPatch = "sed -i -e 's|base < 4.8|base|' hspec-expectations.cabal";
@@ -114,6 +116,8 @@ self: super: {
     buildDepends = [ primitive ];
     license = pkgs.stdenv.lib.licenses.bsd3;
   }) {};
+
+  mono-traversable = addBuildDepend super.mono-traversable self.semigroups;
 
   # diagrams/monoid-extras#19
   monoid-extras = overrideCabal super.monoid-extras (drv: {
@@ -181,14 +185,13 @@ self: super: {
   # lens-family-th >= 0.5.0.0 is GHC 8.0 only
   lens-family-th = self.lens-family-th_0_4_1_0;
 
-  # cereal must have `fail` in pre-ghc-8.0.x versions
-  cereal = addBuildDepend super.cereal self.fail;
 
   # The tests in vty-ui do not build, but vty-ui itself builds.
   vty-ui = enableCabalFlag super.vty-ui "no-tests";
 
   # https://github.com/fpco/stackage/issues/1112
-  vector-algorithms = dontCheck super.vector-algorithms;
+  vector-algorithms = addBuildDepends (dontCheck super.vector-algorithms)
+    [ self.mtl self.mwc-random ];
 
   # Trigger rebuild to mitigate broken packaes on Hydra.
   amazonka-core = triggerRebuild super.amazonka-core 1;
@@ -210,6 +213,10 @@ self: super: {
   intervals = addBuildDepends super.intervals (with self; [doctest QuickCheck]);
   Glob_0_7_9 = addBuildDepends super.Glob_0_7_9 (with self; [semigroups]);
   Glob = addBuildDepends super.Glob (with self; [semigroups]);
+  # cereal must have `fail` in pre-ghc-8.0.x versions
+  # also tests require bytestring>=0.10.8.1
+  cereal = dontCheck (addBuildDepend super.cereal self.fail);
+  cereal_0_5_2_0 = dontCheck (addBuildDepend super.cereal_0_5_2_0 self.fail);
 
   # Moved out from common as no longer the case for GHC8
   ghc-mod = super.ghc-mod.override { cabal-helper = self.cabal-helper_0_6_3_1; };

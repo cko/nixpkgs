@@ -22,22 +22,17 @@ let
 
     kdeDerivation = args:
       let
-        setupHook =
-          let drv = { qtbase, qttools }:
-                makeSetupHook { deps = [ qtbase qttools ]; } ./setup-hook.sh;
-          in callPackage drv {};
       in stdenv.mkDerivation (args // {
 
         outputs = args.outputs or [ "dev" "out" ];
+
+        propagatedUserEnvPkgs =
+          builtins.map lib.getBin (args.propagatedBuildInputs or []);
 
         cmakeFlags =
           (args.cmakeFlags or [])
           ++ [ "-DBUILD_TESTING=OFF" ]
           ++ lib.optional debug "-DCMAKE_BUILD_TYPE=Debug";
-
-        nativeBuildInputs =
-          (args.nativeBuildInputs or [])
-          ++ [ pkgs.cmake pkgs.pkgconfig setupHook ];
 
       });
 
@@ -58,11 +53,27 @@ let
         } // (args.meta or {});
       });
 
+    kdeEnv = import ./kde-env.nix {
+      inherit (pkgs) stdenv lib;
+      inherit (pkgs.xorg) lndir;
+    };
+
+    kdeWrapper = import ./kde-wrapper.nix {
+      inherit (pkgs) stdenv lib makeWrapper;
+      inherit kdeEnv;
+    };
+
     attica = callPackage ./attica.nix {};
     baloo = callPackage ./baloo.nix {};
     bluez-qt = callPackage ./bluez-qt.nix {};
     breeze-icons = callPackage ./breeze-icons.nix {};
-    extra-cmake-modules = callPackage ./extra-cmake-modules {
+    ecm =
+      let drv = { cmake, ecmNoHooks, pkgconfig, qtbase, qttools }:
+            makeSetupHook
+            { deps = [ cmake ecmNoHooks pkgconfig qtbase qttools ]; }
+            ./setup-hook.sh;
+      in callPackage drv {};
+    ecmNoHooks = callPackage ./extra-cmake-modules {
       inherit (srcs.extra-cmake-modules) src version;
     };
     frameworkintegration = callPackage ./frameworkintegration.nix {};
@@ -115,7 +126,7 @@ let
     kross = callPackage ./kross.nix {};
     krunner = callPackage ./krunner.nix {};
     kservice = callPackage ./kservice {};
-    ktexteditor = callPackage ./ktexteditor {};
+    ktexteditor = callPackage ./ktexteditor.nix {};
     ktextwidgets = callPackage ./ktextwidgets.nix {};
     kunitconversion = callPackage ./kunitconversion.nix {};
     kwallet = callPackage ./kwallet.nix {};

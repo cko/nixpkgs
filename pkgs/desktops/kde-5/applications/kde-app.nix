@@ -11,6 +11,11 @@ kdeDerivation (args // {
   name = "${name}-${version}";
   inherit src;
 
+  cmakeFlags =
+    (args.cmakeFlags or [])
+    ++ [ "-DBUILD_TESTING=OFF" ]
+    ++ lib.optional debug "-DCMAKE_BUILD_TYPE=Debug";
+
   meta = {
     platforms = lib.platforms.linux;
     homepage = "http://www.kde.org";

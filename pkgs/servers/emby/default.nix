@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   name = "emby-${version}";
-  version = "3.0.6000";
+  version = "3.0.6030";
 
   src = fetchurl {
     url = "https://github.com/MediaBrowser/Emby/archive/${version}.tar.gz";
-    sha256 = "1q1l6gl8k3rxklmw52vcpp4r6iwyhydv61zjbz5v66zpvi64w8is";
+    sha256 = "14fmgb8pwj11n57c1rm002ylwqapdqywbpsv7z6skairbaf6ny09";
   };
 
   propagatedBuildInputs = with pkgs; [
