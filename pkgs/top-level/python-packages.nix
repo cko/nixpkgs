@@ -21037,7 +21037,7 @@ in modules // {
       url = "mirror://pypi/r/rpy2/${name}.tar.gz";
       sha256 = "2c1a313df4e64236dcfe1078ce847b8e3c180656c894928d3a4b391aacb9b24c";
     };
-    buildInputs = with pkgs; [ readline R pcre lzma bzip2 zlib icu ];
+    buildInputs = with pkgs; [ modules.readline pkgs.R pkgs.pcre pkgs.lzma pkgs.bzip2 pkgs.zlib pkgs.icu ];
     propagatedBuildInputs = with self; [ singledispatch six ];
 
     # According to manual this is how the testsuite should be invoked
