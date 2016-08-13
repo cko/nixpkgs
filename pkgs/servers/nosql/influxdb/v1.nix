@@ -8,6 +8,6 @@ import ./default.nix (args // rec {
     owner = "influxdata";
     repo = "influxdb";
     rev = "v${version}";
-    sha256 = "80e7e8ab7236b04bb0df65cc5134f89ea0a389057937f7685d0055a852e40930";
+    sha256 = "1hj9wl2bfd1llc11jrv8bq18wl2y9n6fl3w6052wb530j7gsivsq";
   };
 }) 
